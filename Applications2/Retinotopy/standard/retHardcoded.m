@@ -31,6 +31,9 @@ function [params,response,timing] = retHardcoded
 % - get rid of resolution changing on open and close
 % - 
 
+homeDir = fileparts(mfilename('fullpath'));
+addpath(genpath(fullfile(homeDir,'..','..','..')))
+
 
 % get some parameters from graphical interface
 params = retCreateDefaultGUIParams([]);
@@ -52,5 +55,7 @@ params = setRetinotopyParams(params.experiment, params);
 % set response device
 params = setRetinotopyDevices(params);
 
-% goq
+% go
 [response,timing] = doRetinotopyScan(params);
+
+rmpath(genpath(fullfile(homeDir,'..','..','..')))
