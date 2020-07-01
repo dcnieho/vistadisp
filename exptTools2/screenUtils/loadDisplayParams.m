@@ -130,7 +130,7 @@ chdir(displayPath);
 try
     disp(['Loading display params from ' displayDir '...']);
     displayID = feval('displayParams');
-    displayID.screenNumber = max( Screen('Screens') );
+    %displayID.screenNumber = max( Screen('Screens') );
     if(~isfield(displayID,'computerName'))
         displayID.computerName = 'unspecified';
     end

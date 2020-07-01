@@ -23,7 +23,7 @@ switch lower(modality)
         % Time to show each image is relative to experiment start, rather
         % than relate to last screen flip because we do not want to accrue
         % timing error over the course of the experiment
-        params.display.timeFromT0 = false;
+        params.display.timeFromT0 = true;
         
     case {'eeg' 'ecog' 'meg'}
         % We need to add modality to the display field as well as the

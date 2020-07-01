@@ -1,4 +1,4 @@
-function doRetinotopyScan(params)
+function [response,timing] = doRetinotopyScan(params)
 % doRetinotopyScan - runs retinotopy scans
 %
 % doRetinotopyScan(params)
@@ -13,7 +13,7 @@ function doRetinotopyScan(params)
 
 % defaults
 if ~exist('params', 'var'), error('No parameters specified!'); end
-if ~isfield(params, 'skipSyncTests'), skipSyncTests = true;
+if ~isfield(params, 'skipSyncTests'), skipSyncTests = 1;
 else                                  skipSyncTests = params.skipSyncTests; end
 
 if isempty(params.saveMatrix),  removeImages = true; 
@@ -36,6 +36,7 @@ try
     Screen('Preference','SkipSyncTests', skipSyncTests);
     
     % Open the screen
+%     PsychDebugWindowConfiguration();
     params.display                = openScreen(params.display);
     params.display.devices        = params.devices;
     
@@ -82,7 +83,7 @@ try
         
         % save
         if params.savestimparams,
-            filename = ['~/Desktop/' datestr(now,30) '.mat'];
+            filename = ['C:\Users\HP\Downloads\vistadisp-master\' datestr(now,30) '.mat'];
             save(filename);                % save parameters
             fprintf('[%s]:Saving in %s.',mfilename,filename);
         end;

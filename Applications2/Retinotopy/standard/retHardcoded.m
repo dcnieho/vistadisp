@@ -1,4 +1,4 @@
-function [params,response,timing] = ret(params)
+function [params,response,timing] = retHardcoded
 % [params] = ret([params])
 %
 % ret - program to start retinotopic mapping experiments (under OSX)
@@ -26,12 +26,25 @@ function [params,response,timing] = ret(params)
 %   params.fixation = 'dot';
 %   ret(params)
 
-% get some parameters from graphical interface
-if ~exist('params', 'var'), params = []; end
-params = retMenu(params);
+% TODO:
+% - stimulus moving
+% - get rid of resolution changing on open and close
+% - 
 
-% if user aborted GUI, exit gracefully
-if notDefined('params'), return; end
+
+% get some parameters from graphical interface
+params = retCreateDefaultGUIParams([]);
+params.triggerKey = 's';
+params.prescanDuration = 0;
+params.stimSize = 4.5;
+params.runPriority = 1;
+
+% these are somehow set in the GUI automatically:
+params.interleaves = [];
+params.loadMatrix = [];
+params.saveMatrix = [];
+params.calibration = 'demo';
+params.skipSyncTests = 1;
 
 % now set rest of the params
 params = setRetinotopyParams(params.experiment, params);
@@ -39,5 +52,5 @@ params = setRetinotopyParams(params.experiment, params);
 % set response device
 params = setRetinotopyDevices(params);
 
-% go
+% goq
 [response,timing] = doRetinotopyScan(params);

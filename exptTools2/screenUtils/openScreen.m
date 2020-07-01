@@ -18,7 +18,7 @@ function displayID = openScreen(displayID, hideCursorFlag)
 % ##/##/## rfd & sod wrote it.
 % 04/12/06 shc (shcheung@stanford.edu) cleaned it and added the help
 % comments.
-
+displayID.frameRate = 120;
 frameRate = displayID.frameRate;
 
 if(~exist('hideCursorFlag','var')||isempty(hideCursorFlag))
@@ -70,29 +70,30 @@ end
 % Skip the annoying blue flickering warning
 % Screen('Preference','SkipSyncTests',1);
 
-displayID.oldGamma = Screen('ReadNormalizedGammaTable', displayID.screenNumber);
-try
-    Screen('LoadNormalizedGammaTable', displayID.screenNumber,displayID.gamma);
-catch ME
-    warning(ME.identifier, ME.message)
-    % displayID.gamma may be 10bit in that case reduce to 8 spanning entire
-    % range
-    putgamma = displayID.gamma(round(linspace(1,size(displayID.gamma,1),256)),:);
-    Screen('LoadNormalizedGammaTable', displayID.screenNumber,putgamma);
-end;
+% displayID.oldGamma = Screen('ReadNormalizedGammaTable', displayID.screenNumber);
+% try
+%     Screen('LoadNormalizedGammaTable', displayID.screenNumber,displayID.gamma);
+% catch ME
+%     warning(ME.identifier, ME.message)
+%     % displayID.gamma may be 10bit in that case reduce to 8 spanning entire
+%     % range
+%     putgamma = displayID.gamma(round(linspace(1,size(displayID.gamma,1),256)),:);
+%     Screen('LoadNormalizedGammaTable', displayID.screenNumber,putgamma);
+% end;
 
 % Force the resolution indicated in the display parameter file.  Let the
 % user know if this fails, storing the actual resolution and hz within
 % displayID and proceeding.
-try
-    % First try to set spatial resolution, then spatial and temporal. We
-    % try this sequentially because if we fail to set the correct temporal
-    % resolution, we would still like to get the screen size right.
-    Screen('Resolution', displayID.screenNumber, displayID.numPixels(1), displayID.numPixels(2));
-    Screen('Resolution', displayID.screenNumber, displayID.numPixels(1), displayID.numPixels(2), displayID.frameRate);
-catch ME
-    warning(ME.identifier, ME.message)
-end
+% try
+%     % First try to set spatial resolution, then spatial and temporal. We
+%     % try this sequentially because if we fail to set the correct temporal
+%     % resolution, we would still like to get the screen size right.
+%     Screen('Resolution', displayID.screenNumber, displayID.numPixels(1), displayID.numPixels(2));
+%     Screen('Resolution', displayID.screenNumber, displayID.numPixels(1), displayID.numPixels(2), 120);
+% catch ME
+%     warning(ME.identifier, ME.message)
+% end
+% displayID.frameRate
 
 params = Screen('Resolution', displayID.screenNumber);
 if (params.width~=displayID.numPixels(1) || params.height~=displayID.numPixels(2) || params.hz~=displayID.frameRate)
@@ -116,7 +117,8 @@ end
 
 % Open the screen and save the window pointer and rect
 numBuffers = 2;
-[displayID.windowPtr,displayID.rect] = Screen('OpenWindow',displayID.screenNumber,...
+fprintf('opening on screen %d\n',displayID.screenNumber);
+[displayID.windowPtr,displayID.rect] = Screen('OpenWindow',1,...
     displayID.backColorRgb, [], displayID.bitsPerPixel, numBuffers);
         
 %Screen('FillRect', displayID.windowPtr, displayID.backColorRgb);
@@ -126,5 +128,6 @@ numBuffers = 2;
 if(hideCursorFlag), HideCursor; end
 
 if ~(displayID.frameRate > 0), displayID.frameRate = frameRate; end
+displayID.frameRate  = 120;
 
 return;

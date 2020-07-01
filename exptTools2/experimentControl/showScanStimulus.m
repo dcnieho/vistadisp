@@ -82,6 +82,7 @@ response.keyCode = zeros(length(stimulus.seq),1); % get 1 buttons max
 response.secs = zeros(size(stimulus.seq));        % timing
 quitProg = 0;
 response.flip = [];
+response.nextflip = zeros(size(stimulus.seq));        % timing
 
 % go
 fprintf('[%s]:Running. Hit %s to quit.\n',mfilename,KbName(quitProgKey));
@@ -123,6 +124,7 @@ for frame = 1:nFrames
     
     %--- timing
     [waitTime, nextFlipTime] = getWaitTime(stimulus, response, frame,  t0, timeFromT0);
+    response.nextflip(frame) = nextFlipTime;
     
 
     % if there is time release cpu

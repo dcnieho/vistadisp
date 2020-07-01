@@ -9,7 +9,7 @@ function [waitTime, nextFlipTime] = getWaitTime(stimulus, response, frame, t0, t
 
 
 if timeFromT0
-    nextFlipTime = t0 + stimulus.seqtiming(frame); 
+    nextFlipTime = t0 + stimulus.seqtiming(frame) - 0.004;  % 4 ms slop time is plenty on modern system
     waitTime     =  GetSecs-nextFlipTime;
     
 else

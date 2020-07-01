@@ -3,9 +3,9 @@ function params = displayParams
 % Laptop at 128 Fillmore
 % ARW 022402
 % Critical parameters
-params.numPixels = [1024 768];
-params.dimensions = [24.6 18.3];
-params.distance = 40;
+params.numPixels = [1920 1080];
+params.dimensions = [70 39];
+params.distance = 205;
 params.frameRate = 120;
 params.cmapDepth = 10;
 params.screenNumber = 1;
