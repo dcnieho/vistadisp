@@ -42,8 +42,15 @@ try
     % to allow blending
     Screen('BlendFunction', params.display.windowPtr, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
+    % find out where on screen grating should be displayed
+    destRect = positionOnScreen(params);
+    
     % Store the images in textures
     stimulus = createTextures(params.display,stimulus, removeImages);
+    
+    % position on screen
+    [stimulus.destRect] = deal(destRect);   % override positioning
+    [params.display.fixX,params.display.fixY] = RectCenterd(destRect);
     
     % If necessary, flip the screen LR or UD  to account for mirrors
     % We now do a single screen flip before the experiment starts (instead
