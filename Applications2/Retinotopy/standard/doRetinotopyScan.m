@@ -36,7 +36,6 @@ try
     Screen('Preference','SkipSyncTests', skipSyncTests);
     
     % Open the screen
-%     PsychDebugWindowConfiguration();
     params.display                = openScreen(params.display);
     params.display.devices        = params.devices;
     
@@ -72,7 +71,7 @@ try
         [time0] = countDown(params.display,params.countdown,params.startScan, params.trigger);
         time0   = time0 + params.startScan; % we know we should be behind by that amount
                         
-        [response, timing, quitProg] = showScanStimulus(params.display,stimulus,time0); %#ok<ASGLU>
+        [response, timing, quitProg] = showScanStimulus(params.display,stimulus,time0);
                 
         % reset priority
         Priority(0);

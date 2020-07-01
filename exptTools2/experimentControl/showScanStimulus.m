@@ -119,7 +119,7 @@ for frame = 1:nFrames
         % in recent times (07.14.2008). So, for now we set it to 1.  It may
         % be that this hsould be
         drawFixation(display,stimulus.fixSeq(frame));
-        Screen('LoadNormalizedGammaTable', display.windowPtr, stimulus.cmap(:,:,gammaNum));
+        %Screen('LoadNormalizedGammaTable', display.windowPtr, stimulus.cmap(:,:,gammaNum));
     end;
     
     %--- timing
