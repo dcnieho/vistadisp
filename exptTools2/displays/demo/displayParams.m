@@ -1,16 +1,15 @@
 function params = displayParams
 %
-% Laptop at 128 Fillmore
-% ARW 022402
+% Screen at Lund 7T
 % Critical parameters
 params.numPixels = [1920 1080];
 params.dimensions = [70 39];
 params.distance = 205;
 params.frameRate = 120;
 params.cmapDepth = 10;
-params.screenNumber = 1;
+params.screenNumber = 0;
 % Descriptive parameters
-params.computerName = 'Yellow';
-params.monitor = 'YellowLaptopLCD';
-params.card = 'RadeonMobility7500';
-params.position = 'Jordan 474';
+params.computerName = 'n.a.';
+params.monitor = 'n.a.';
+params.card = 'n.a.';
+params.position = 'n.a.';

@@ -10,7 +10,7 @@ function displayID = closeScreen(displayID)
 % 04/12/06 shc (shcheung@stanford.edu) cleaned it and added the help
 % comments.
 
-if(isfield(displayID,'oldGamma') & ~isempty(displayID.oldGamma))
+if(isfield(displayID,'oldGamma') && ~isempty(displayID.oldGamma))
     Screen('LoadNormalizedGammaTable', displayID.screenNumber, displayID.oldGamma);
 end
 Screen('CloseAll');

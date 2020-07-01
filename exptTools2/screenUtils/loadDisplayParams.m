@@ -228,15 +228,6 @@ try
     end
     chdir(homedir);
 
-    % Check the frame rate
-    hz = Screen('FrameRate', displayID.screenNumber);
-
-    %if MacOSX does not know the frame rate the 'FrameRate' will return 0.
-    if(hz~=0 && abs(displayID.frameRate-hz)/displayID.frameRate > 0.01)
-        warning('Current frame rate (%0.1f Hz) != displayID.frameRate (%0.1f Hz)- correcting displayID.frameRate.',hz, displayID.frameRate);
-        displayID.frameRate = hz;
-    end
-
 catch
     chdir(homedir);
     rethrow(lasterror);

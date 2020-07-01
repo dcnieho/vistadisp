@@ -18,21 +18,9 @@ function displayID = openScreen(displayID, hideCursorFlag)
 % ##/##/## rfd & sod wrote it.
 % 04/12/06 shc (shcheung@stanford.edu) cleaned it and added the help
 % comments.
-displayID.frameRate = 120;
-frameRate = displayID.frameRate;
 
 if(~exist('hideCursorFlag','var')||isempty(hideCursorFlag))
     hideCursorFlag = true;
-end
-
-if(~isfield(displayID,'screenNumber'))
-	displayID.screenNumber = 0;
-	disp('Using default screen number of 0');
-end
-
-if(~isfield(displayID,'frameRate'))
-	displayID.frameRate = 75;
-	disp('Using default frame rate of 75 Hz');
 end
 
 if(~isfield(displayID,'bitsPerPixel'))
@@ -57,11 +45,6 @@ if(~isfield(displayID,'gammaTable'))
 	disp('Using default linear gamma table');
 end
 
-if(~isfield(displayID,'distance'));
-	displayID.distance = 50;
-	disp('Using default display distance of 50 cm');
-end
-
 if(~isfield(displayID,'backColorRgb'))
     displayID.backColorRgb = [repmat(round(displayID.maxRgbValue/2),1,3) displayID.maxRgbValue];
 	disp(['Setting backColorRgb to ',num2str(displayID.backColorRgb),'.']);
@@ -70,64 +53,23 @@ end
 % Skip the annoying blue flickering warning
 % Screen('Preference','SkipSyncTests',1);
 
-% displayID.oldGamma = Screen('ReadNormalizedGammaTable', displayID.screenNumber);
-% try
-%     Screen('LoadNormalizedGammaTable', displayID.screenNumber,displayID.gamma);
-% catch ME
-%     warning(ME.identifier, ME.message)
-%     % displayID.gamma may be 10bit in that case reduce to 8 spanning entire
-%     % range
-%     putgamma = displayID.gamma(round(linspace(1,size(displayID.gamma,1),256)),:);
-%     Screen('LoadNormalizedGammaTable', displayID.screenNumber,putgamma);
-% end;
-
-% Force the resolution indicated in the display parameter file.  Let the
-% user know if this fails, storing the actual resolution and hz within
-% displayID and proceeding.
-% try
-%     % First try to set spatial resolution, then spatial and temporal. We
-%     % try this sequentially because if we fail to set the correct temporal
-%     % resolution, we would still like to get the screen size right.
-%     Screen('Resolution', displayID.screenNumber, displayID.numPixels(1), displayID.numPixels(2));
-%     Screen('Resolution', displayID.screenNumber, displayID.numPixels(1), displayID.numPixels(2), 120);
-% catch ME
-%     warning(ME.identifier, ME.message)
+% check screen is at right resolution and refresh rate
+rect                = Screen('Rect',displayID.screenNumber);
+frate               = Screen('NominalFrameRate',displayID.screenNumber);
+% assert(isequal(rect(3:4),displayID.numPixels),'expected resolution of [%s], but got [%s]',num2str(displayID.numPixels),num2str(rect(3:4)));
+% if frate==59 && expt.scr.framerate==60
+%     % see http://support.microsoft.com/kb/2006076, 59 Hz == 59.94Hz
+%     % (and thus == 60 Hz)
+%     warning('WARNING: Windows reported 59Hz again, ignoring it and pretending its 60 Hz...'); %#ok<WNTAG>
+%     frate=60;
 % end
-% displayID.frameRate
+% assert(frate==displayID.frameRate,'expected framerate of %d, but got %d',displayID.frameRate,frate);
 
-params = Screen('Resolution', displayID.screenNumber);
-if (params.width~=displayID.numPixels(1) || params.height~=displayID.numPixels(2) || params.hz~=displayID.frameRate)
-
-    % something is wrong here. We use display.dimensions to indicate the
-    % screen size in cm, not pixels. PTB cannot tell us the size in cm, so
-    % we should not edit this field.
-    %   displayID.dimensions(1) = params.height;
-    %   displayID.dimensions(2) = params.width;
-    displayID.numPixels     = [params.width params.height];
-
-    displayID.frameRate     = params.hz;
-
-    beep;
-    display('WARNING: Failed to set indicated resolution and refresh rate.');
-    display('Saving current resolution and refresh rate to display structure...');
-else
-    display('Resolution and refresh rate successfully set.');
-end
-        
 
 % Open the screen and save the window pointer and rect
-numBuffers = 2;
 fprintf('opening on screen %d\n',displayID.screenNumber);
-[displayID.windowPtr,displayID.rect] = Screen('OpenWindow',1,...
-    displayID.backColorRgb, [], displayID.bitsPerPixel, numBuffers);
-        
-%Screen('FillRect', displayID.windowPtr, displayID.backColorRgb);
-%drawFixation(displayID); Not sure why we needed to draw a fixation
-%immediately - this seems like something that should be up to the user
-%Screen('Flip', displayID.windowPtr, 3);
-if(hideCursorFlag), HideCursor; end
+[displayID.windowPtr,displayID.rect] = Screen('OpenWindow',displayID.screenNumber,displayID.backColorRgb);
 
-if ~(displayID.frameRate > 0), displayID.frameRate = frameRate; end
-displayID.frameRate  = 120;
+if(hideCursorFlag), HideCursor; end
 
 return;
