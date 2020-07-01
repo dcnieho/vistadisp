@@ -56,14 +56,14 @@ end
 % check screen is at right resolution and refresh rate
 rect                = Screen('Rect',displayID.screenNumber);
 frate               = Screen('NominalFrameRate',displayID.screenNumber);
-% assert(isequal(rect(3:4),displayID.numPixels),'expected resolution of [%s], but got [%s]',num2str(displayID.numPixels),num2str(rect(3:4)));
-% if frate==59 && expt.scr.framerate==60
-%     % see http://support.microsoft.com/kb/2006076, 59 Hz == 59.94Hz
-%     % (and thus == 60 Hz)
-%     warning('WARNING: Windows reported 59Hz again, ignoring it and pretending its 60 Hz...'); %#ok<WNTAG>
-%     frate=60;
-% end
-% assert(frate==displayID.frameRate,'expected framerate of %d, but got %d',displayID.frameRate,frate);
+assert(isequal(rect(3:4),displayID.numPixels),'expected resolution of [%s], but got [%s]',num2str(displayID.numPixels),num2str(rect(3:4)));
+if frate==59 && expt.scr.framerate==60
+    % see http://support.microsoft.com/kb/2006076, 59 Hz == 59.94Hz
+    % (and thus == 60 Hz)
+    warning('WARNING: Windows reported 59Hz again, ignoring it and pretending its 60 Hz...'); %#ok<WNTAG>
+    frate=60;
+end
+assert(frate==displayID.frameRate,'expected framerate of %d, but got %d',displayID.frameRate,frate);
 
 
 % Open the screen and save the window pointer and rect
