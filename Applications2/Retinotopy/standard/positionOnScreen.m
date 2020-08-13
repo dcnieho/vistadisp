@@ -5,7 +5,15 @@ img = makeRetinotopyWholeStim(params);
 tex = Screen('MakeTexture',params.display.windowPtr, double(img));
 
 srcRect = [0,0,size(img, 2), size(img, 1)];
-destRect = CenterRect(srcRect, params.display.rect);
+
+% check if positioning info already exist for this subject
+posfile = fullfile(params.homeDir,'stimulusPositioning',sprintf('%s.mat',params.subject));
+if ~~exist(posfile,'file')
+    a=load(posfile);
+    destRect = a.destRect;
+else
+    destRect = CenterRect(srcRect, params.display.rect);
+end
 
 % display, listen for key press, until done
 stepSz = 10;
@@ -51,6 +59,9 @@ while true
         end
     end
 end
+
+% save to file for later initialization of this display
+save(posfile,'destRect');
 
 % clear screen
 Screen('Flip', params.display.windowPtr);

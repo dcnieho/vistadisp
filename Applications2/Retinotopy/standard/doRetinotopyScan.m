@@ -89,7 +89,7 @@ try
         
         % save
         if params.savestimparams,
-            filename = ['C:\Users\HP\Downloads\vistadisp-master\' datestr(now,30) '.mat'];
+            filename = fullfile(params.homeDir,'data',sprintf('%s_%s.mat',params.subject,datestr(now,30)));
             save(filename);                % save parameters
             fprintf('[%s]:Saving in %s.',mfilename,filename);
         end;

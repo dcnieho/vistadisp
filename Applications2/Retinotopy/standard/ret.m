@@ -26,9 +26,29 @@ function [params,response,timing] = ret(params)
 %   params.fixation = 'dot';
 %   ret(params)
 
+homeDir = fullfile(fileparts(mfilename('fullpath')),'..','..','..');
+addpath(genpath(homeDir))
+
+% make directories
+dataDir = fullfile(homeDir,'data');
+if ~isdir(dataDir)
+    mkdir(dataDir);
+end
+posDir = fullfile(homeDir,'stimulusPositioning');
+if ~isdir(posDir)
+    mkdir(posDir);
+end
+
+subject = input('Enter Subject Initials: ','s');
+assert(~isempty(subject),'provide a subject name');
+
 % get some parameters from graphical interface
 if ~exist('params', 'var'), params = []; end
 params = retMenu(params);
+
+% add info about subject and script
+params.homeDir = homeDir;
+params.subject = subject;
 
 % if user aborted GUI, exit gracefully
 if notDefined('params'), return; end
@@ -41,3 +61,5 @@ params = setRetinotopyDevices(params);
 
 % go
 [response,timing] = doRetinotopyScan(params);
+
+rmpath(genpath(homeDir))

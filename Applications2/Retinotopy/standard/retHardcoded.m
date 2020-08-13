@@ -31,8 +31,21 @@ function [params,response,timing] = retHardcoded
 % - get rid of resolution changing on open and close
 % - 
 
-homeDir = fileparts(mfilename('fullpath'));
-addpath(genpath(fullfile(homeDir,'..','..','..')))
+homeDir = fullfile(fileparts(mfilename('fullpath')),'..','..','..');
+addpath(genpath(homeDir))
+
+% make directories
+dataDir = fullfile(homeDir,'data');
+if ~isdir(dataDir)
+    mkdir(dataDir);
+end
+posDir = fullfile(homeDir,'stimulusPositioning');
+if ~isdir(posDir)
+    mkdir(posDir);
+end
+
+subject = input('Enter Subject Initials: ','s');
+assert(~isempty(subject),'provide a subject name');
 
 
 % get some parameters from graphical interface
@@ -49,6 +62,10 @@ params.saveMatrix = [];
 params.calibration = 'demo';
 params.skipSyncTests = 1;
 
+% add info about subject and script
+params.homeDir = homeDir;
+params.subject = subject;
+
 % now set rest of the params
 params = setRetinotopyParams(params.experiment, params);
 
@@ -58,4 +75,4 @@ params = setRetinotopyDevices(params);
 % go
 [response,timing] = doRetinotopyScan(params);
 
-rmpath(genpath(fullfile(homeDir,'..','..','..')))
+rmpath(genpath(homeDir))
