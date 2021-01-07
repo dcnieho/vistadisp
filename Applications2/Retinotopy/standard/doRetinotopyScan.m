@@ -45,6 +45,49 @@ try
     % find out where on screen grating should be displayed
     destRect = positionOnScreen(params);
     
+    % setup EL
+    if isfield(params,'useEL') && params.useEL
+        Eyelink('SetAddress',params.EL.ip);
+        el                              = EyelinkInitDefaults(wpnt);
+        el.backgroundcolour             = params.backRGB.dir.*params.backRGB.scale;
+        el.foregroundcolour             = params.stimLMS.dir.*params.stimLMS.scale;
+        el.calibrationtargetcolour      = [255 0 0];
+        el.msgfontcolour                = GrayIndex(wpnt);
+        el.calibrationtargetsize        = 20/params.display.numPixels(1)*100;  % in percentage of screen size
+        el.calibrationtargetwidth       = 6/params.display.numPixels(1)*100;
+        % switch off sounds (set to 0) as they are annoying and i've had issues with them crashing
+        el.targetbeep                   = 0;
+        el.feedbackbeep                 = 0;
+        EyelinkUpdateDefaults(el);
+        if ~EyelinkInit(params.el.useDummy)
+            error('Eyelink Init failed.\n');
+        end
+        Eyelink('Command', 'sample_rate = 1000');
+        Eyelink('Command', 'calibration_type = HV9');
+        Eyelink('Command', 'aux_mouse_simulation = NO');
+        Eyelink('Command', 'active_eye = RIGHT');
+        % TODO: set calibrated/used part of screen, based on positioning.
+        % perhaps:
+%         Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, width-1, height-1);
+%         Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, width-1, height-1);
+        % TODO: also set display geometry
+        Eyelink('command', 'file_sample_data  = LEFT,RIGHT,GAZE,HREF,AREA,HTARGET,GAZERES,STATUS,INPUT');
+        Eyelink('command', 'link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,HTARGET,STATUS,INPUT');
+        [v, vs]=Eyelink('GetTrackerVersion');
+        fprintf('Running experiment on a "%s" tracker.\n', vs);
+        Eyelink('Openfile', params.EL.filenm);
+        % Do camera setup and calibrate the eye tracker
+        Eyelink('Command', 'sticky_mode_data_enable DATA = 1 1 1 1'); % request to store data samples and events during calibration and validation to file
+        EyelinkDoTrackerSetup(el);
+        Eyelink('Command', 'sticky_mode_data_enable'); % stop sending samples, events to data file
+        Eyelink('Command', 'set_idle_mode');
+        WaitSecs(0.1); % short wait so that the tracker can finish the mode transition
+        Eyelink('Command', 'setup_menu_mode');  % sticky_mode_data_enable is only switched off when there is an actual mode change. the above set_idle_mode is a no-op as the tracker is already offline at that point. If sticky mode is not switched off properly, we end up with junk samples in a small bit of the edf file, overwriting part of the next trial
+        WaitSecs(0.1); % short wait so that the tracker can finish the mode transition
+        Eyelink('Command', 'set_idle_mode');
+        WaitSecs(0.1); % short wait so that the tracker can finish the mode transition
+    end
+    
     % Store the images in textures
     stimulus = createTextures(params.display,stimulus, removeImages);
     
@@ -65,6 +108,18 @@ try
         % reset colormap?
         retResetColorMap(params);
         
+        % prep EL for recording
+        if isfield(params,'useEL') && params.useEL
+            Eyelink('Command', 'set_idle_mode');
+            WaitSecs(0.1); % short wait so that the tracker can finish the mode transition
+            Eyelink('Message', 'TRIALID %d', n);
+            Eyelink('message', 'repetition %d', n);
+            Eyelink('StartRecording', 1, 1, 1, 1);
+            % record a few samples before we actually start displaying
+            % otherwise you may lose a few msec of data
+            WaitSecs(0.1);
+        end
+        
         % wait for go signal
         onlyWaitKb = false;
         pressKey2Begin(params.display, onlyWaitKb, [], [], params.triggerKey);
@@ -78,7 +133,7 @@ try
         [time0] = countDown(params.display,params.countdown,params.startScan, params.trigger);
         time0   = time0 + params.startScan; % we know we should be behind by that amount
                         
-        [response, timing, quitProg] = showScanStimulus(params.display,stimulus,time0);
+        [response, timing, quitProg] = showScanStimulus(params.display,stimulus,time0,params);
                 
         % reset priority
         Priority(0);

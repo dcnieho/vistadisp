@@ -1,4 +1,4 @@
-function [response, timing, quitProg] = showScanStimulus(display, stimulus, t0)
+function [response, timing, quitProg] = showScanStimulus(display, stimulus, t0, params)
 % [response, timing, quitProg] = showStimulus(display,stimulus, ...
 %           [time0 = GetSecs], [timeFromT0 = true])
 %
@@ -32,6 +32,10 @@ function [response, timing, quitProg] = showScanStimulus(display, stimulus, t0)
 %                 false, we time each screen flip from the last screen
 %                 flip. Ideally the results are the same.
 
+usingEL = false;
+if nargin>3 && isfield(params,'useEL') && params.useEL
+    usingEL = true;
+end
 
 % HACK
 params.modality = 'meg';
@@ -92,6 +96,7 @@ if isfield(stimulus, 'diodeSeq') && ~isempty(stimulus.diodeSeq)
     drawTrig(display,0);
 end
 
+qPostedSync = false;
 for frame = 1:nFrames
     
     KbQueueStart;
@@ -138,6 +143,10 @@ for frame = 1:nFrames
     
     %--- update screen
     VBLTimestamp = Screen('Flip',display.windowPtr, nextFlipTime);
+    if ~qPostedSync && usingEL
+        % indicate start of recording interval
+        Eyelink('Message', 'SYNCTIME');
+    end
     
     % send trigger for MEG, if requested, and record the color of the PD
     % cue
@@ -197,8 +206,16 @@ for frame = 1:nFrames
 end;
 
 % that's it
-ShowCursor;
 timing = GetSecs-t0;
+if usingEL
+    Eyelink('Message', 'BLANK_SCREEN');
+    % adds 100 msec of data to catch final events
+    WaitSecs(0.1);
+    % stop the recording of eye-movements for the current trial
+    Eyelink('StopRecording');
+    Eyelink('Message', 'TRIAL_RESULT 0')
+end
+ShowCursor;
 fprintf('[%s]:Stimulus run time: %f seconds [should be: %f].\n',mfilename,timing,max(stimulus.seqtiming));
 
 return;

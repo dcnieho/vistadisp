@@ -46,6 +46,8 @@ end
 
 subject = input('Enter Subject Initials: ','s');
 assert(~isempty(subject),'provide a subject name');
+useET = input('Use EyeLink? (y/n): ','s');
+assert(any(strcmpi(useET,{'y','n'})))
 
 
 % get some parameters from graphical interface
@@ -72,7 +74,39 @@ params = setRetinotopyParams(params.experiment, params);
 % set response device
 params = setRetinotopyDevices(params);
 
+% some ET setup
+params.useEL = strcmpi(useET,'y');
+if params.useEL
+    % eyelink only does 8.3 filenames, shorten subject name based
+    % on that. We'll store on expt system using full name of
+    % course, this is just for the host system, filename.
+    eyesub_short     = params.subject(1:min(end,8));
+    params.EL.filenm = [eyesub_short '.edf'];
+    
+    params.EL.ip        = '';       % empty: default. if non-standard, put ip, e.g. '192.168.10.13'
+    params.el.useDummy  = false;    % if true dummy mode is used, i.e., no actual EL has to be connected
+end
+
 % go
 [response,timing] = doRetinotopyScan(params);
+
+% get EL data file
+if params.useEL
+    Eyelink('Command', 'set_idle_mode');
+    WaitSecs(0.5);
+    Eyelink('CloseFile');
+    
+    edfFile = fullfile(params.homeDir,'data',sprintf('%s.edf',params.subject));
+    try
+        fprintf('Receiving data file ''%s''\n', edfFile);
+        status=Eyelink('ReceiveFile');
+        if status > 0
+            fprintf('ReceiveFile status %d\n', status);
+        end
+    catch
+        fprintf('Problem receiving data file ''%s''\n', edfFile);
+    end
+    Eyelink('Shutdown');
+end
 
 rmpath(genpath(homeDir))
