@@ -44,6 +44,7 @@ try
     
     % find out where on screen grating should be displayed
     destRect = positionOnScreen(params);
+    [params.display.fixX,params.display.fixY] = RectCenterd(destRect);
     
     % setup EL
     if isfield(params,'useEL') && params.useEL
@@ -66,13 +67,25 @@ try
         Eyelink('Command', 'calibration_type = HV9');
         Eyelink('Command', 'aux_mouse_simulation = NO');
         Eyelink('Command', 'active_eye = RIGHT');
-        % TODO: set calibrated/used part of screen, based on positioning.
-        % perhaps:
-%         Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, width-1, height-1);
-%         Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, width-1, height-1);
-        % TODO: also set display geometry
-        Eyelink('command', 'file_sample_data  = LEFT,RIGHT,GAZE,HREF,AREA,HTARGET,GAZERES,STATUS,INPUT');
-        Eyelink('command', 'link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,HTARGET,STATUS,INPUT');
+        
+        % set display geometry
+        Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, params.display.numPixels(1)-1, params.display.numPixels(2)-1);
+        Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, params.display.numPixels(1)-1, params.display.numPixels(2)-1);
+        Eyelink('command','screen_phys_coords = %ld %ld %ld %ld', -params.display.dimensions(1)/2*10, -params.display.dimensions(2)/2*10, params.display.dimensions(1)/2*10, params.display.dimensions(2)/2*10);
+        Eyelink('command','screen_distance = %ld %ld', params.display.distance*10, params.display.distance*10);
+        % set calibrated/used part of screen, based on per-subject
+        % positioning
+        Eyelink('command','generate_default_targets = NO');
+        calTargets = bsxfun(@plus,bsxfun(@minus,params.EL.basePointPositions,params.EL.basePointPositions(1,:))*params.EL.calScale, [params.display.fixX params.display.fixY]);
+        fmt = repmat('%.0f,%.0f ',1,size(calTargets,1)); fmt(end) = [];
+        EyeLink('command',sprintf(['calibration_targets = ' fmt],calTargets.'));
+        valTargets = bsxfun(@plus,bsxfun(@minus,params.EL.basePointPositions,params.EL.basePointPositions(1,:))*params.EL.valScale, [params.display.fixX params.display.fixY]);
+        EyeLink('command',sprintf(['validation_targets = ' fmt],valTargets.'));
+        
+        Eyelink('command', 'file_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,HREF,PUPIL,STATUS,INPUT,HMARKER,HTARGET');
+        Eyelink('command', 'link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,HTARGET');
+        Eyelink('command', 'file_event_data  = LEFT,RIGHT,MESSAGE,BUTTON,INPUT');
+        Eyelink('command', 'link_event_data  = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT');
         [v, vs]=Eyelink('GetTrackerVersion');
         fprintf('Running experiment on a "%s" tracker.\n', vs);
         Eyelink('Openfile', params.EL.filenm);
@@ -91,9 +104,8 @@ try
     % Store the images in textures
     stimulus = createTextures(params.display,stimulus, removeImages);
     
-    % position on screen
-    [stimulus.destRect] = deal(destRect);   % override positioning
-    [params.display.fixX,params.display.fixY] = RectCenterd(destRect);
+    % override positioning of stimuli on screen
+    [stimulus.destRect] = deal(destRect);
     
     % If necessary, flip the screen LR or UD  to account for mirrors
     % We now do a single screen flip before the experiment starts (instead

@@ -1,4 +1,6 @@
 function retSetupEL_helper
+homeDir = fullfile(fileparts(mfilename('fullpath')),'..','..','..');
+addpath(genpath(homeDir))
 try
     params.calibration = 'demo';
     
@@ -28,11 +30,19 @@ try
     Eyelink('Command', 'calibration_type = HV9');
     Eyelink('Command', 'aux_mouse_simulation = NO');
     Eyelink('Command', 'active_eye = RIGHT');
-    % TODO: set calibrated/used part of screen, based on positioning.
-    % perhaps:
-    %         Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, width-1, height-1);
-    %         Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, width-1, height-1);
-    % TODO: also set display geometry
+    % set display geometry
+    Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, params.display.numPixels(1)-1, params.display.numPixels(2)-1);
+    Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, params.display.numPixels(1)-1, params.display.numPixels(2)-1);
+    Eyelink('command','screen_phys_coords = %ld %ld %ld %ld', -params.display.dimensions(1)/2*10, -params.display.dimensions(2)/2*10, params.display.dimensions(1)/2*10, params.display.dimensions(2)/2*10);
+    Eyelink('command','screen_distance = %ld %ld', params.display.distance*10, params.display.distance*10);
+    % set calibrated/used part of screen
+    Eyelink('command','generate_default_targets = NO');
+    calTargets = bsxfun(@plus,bsxfun(@minus,params.EL.basePointPositions,params.EL.basePointPositions(1,:))*params.EL.calScale,params.EL.basePointPositions(1,:));
+    fmt = repmat('%.0f,%.0f ',1,size(calTargets,1)); fmt(end) = [];
+    EyeLink('command',sprintf(['calibration_targets = ' fmt],calTargets.'));
+    valTargets = bsxfun(@plus,bsxfun(@minus,params.EL.basePointPositions,params.EL.basePointPositions(1,:))*params.EL.valScale,params.EL.basePointPositions(1,:));
+    EyeLink('command',sprintf(['validation_targets = ' fmt],valTargets.'));
+    
     [v, vs]=Eyelink('GetTrackerVersion');
     fprintf('Running experiment on a "%s" tracker.\n', vs);
     Eyelink('Openfile', 'tempdump');
