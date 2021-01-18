@@ -156,7 +156,11 @@ try
         
         % save
         if params.savestimparams,
-            filename = fullfile(params.homeDir,'data',sprintf('%s_%s.mat',params.subject,datestr(now,30)));
+            if isfield(params,'paramsFileName')
+                filename = params.paramsFileName;
+            else
+                filename = fullfile(params.homeDir,'data',sprintf('%s_%s_params.mat',params.subject,datestr(now,30)));
+            end
             save(filename);                % save parameters
             fprintf('[%s]:Saving in %s.',mfilename,filename);
         end;

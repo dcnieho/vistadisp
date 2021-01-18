@@ -53,20 +53,24 @@ assert(any(strcmpi(useET,{'y','n'})))
 % get some parameters from graphical interface
 params = retCreateDefaultGUIParams([]);
 params.triggerKey = 's';
-params.prescanDuration = 0;
+params.prescanDuration = 12;
 params.stimSize = 4.5;
 params.runPriority = 1;
 
 % these are somehow set in the GUI automatically:
 params.interleaves = [];
 params.loadMatrix = [];
-params.saveMatrix = [];
+% params.saveMatrix = []; % set below
 params.calibration = 'demo';
 params.skipSyncTests = 1;
 
 % add info about subject and script
 params.homeDir = homeDir;
 params.subject = subject;
+
+% filenames
+params.paramsFileName = fullfile(params.homeDir,'data',sprintf('%s_%s_params.mat',params.subject,datestr(now,30)));
+params.saveMatrix     = fullfile(params.homeDir,'data',sprintf('%s_%s_images.mat',params.subject,datestr(now,30)));
 
 % now set rest of the params
 params = setRetinotopyParams(params.experiment, params);
