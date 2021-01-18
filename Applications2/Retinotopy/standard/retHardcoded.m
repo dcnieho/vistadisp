@@ -84,7 +84,7 @@ if params.useEL
     params.EL.filenm = [eyesub_short '.edf'];
     
     params.EL.ip        = '';       % empty: default. if non-standard, put ip, e.g. '192.168.10.13'
-    params.el.useDummy  = false;    % if true dummy mode is used, i.e., no actual EL has to be connected
+    params.EL.useDummy  = false;    % if true dummy mode is used, i.e., no actual EL has to be connected
     params.EL.calScale  = .8;
     params.EL.valScale  = .7;
     params.EL.basePointPositions = [

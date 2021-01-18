@@ -60,7 +60,7 @@ try
         el.targetbeep                   = 0;
         el.feedbackbeep                 = 0;
         EyelinkUpdateDefaults(el);
-        if ~EyelinkInit(params.el.useDummy)
+        if ~EyelinkInit(params.EL.useDummy)
             error('Eyelink Init failed.\n');
         end
         Eyelink('Command', 'sample_rate = 1000');
