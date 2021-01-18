@@ -7,7 +7,7 @@ params.dimensions = [70 39];
 params.distance = 205;
 params.frameRate = 120;
 params.cmapDepth = 10;
-params.screenNumber = 0;
+params.screenNumber = 1;
 % Descriptive parameters
 params.computerName = 'n.a.';
 params.monitor = 'n.a.';
