@@ -49,11 +49,11 @@ try
     % setup EL
     if isfield(params,'useEL') && params.useEL
         Eyelink('SetAddress',params.EL.ip);
-        el                              = EyelinkInitDefaults(wpnt);
+        el                              = EyelinkInitDefaults(params.display.windowPtr);
         el.backgroundcolour             = params.backRGB.dir.*params.backRGB.scale;
         el.foregroundcolour             = params.stimLMS.dir.*params.stimLMS.scale;
         el.calibrationtargetcolour      = [255 0 0];
-        el.msgfontcolour                = GrayIndex(wpnt);
+        el.msgfontcolour                = GrayIndex(params.display.windowPtr);
         el.calibrationtargetsize        = 20/params.display.numPixels(1)*100;  % in percentage of screen size
         el.calibrationtargetwidth       = 6/params.display.numPixels(1)*100;
         % switch off sounds (set to 0) as they are annoying and i've had issues with them crashing
@@ -71,21 +71,21 @@ try
         % set display geometry
         Eyelink('command','screen_pixel_coords = %ld %ld %ld %ld', 0, 0, params.display.numPixels(1)-1, params.display.numPixels(2)-1);
         Eyelink('message', 'DISPLAY_COORDS %ld %ld %ld %ld', 0, 0, params.display.numPixels(1)-1, params.display.numPixels(2)-1);
-        Eyelink('command','screen_phys_coords = %ld %ld %ld %ld', -params.display.dimensions(1)/2*10, -params.display.dimensions(2)/2*10, params.display.dimensions(1)/2*10, params.display.dimensions(2)/2*10);
-        Eyelink('command','screen_distance = %ld %ld', params.display.distance*10, params.display.distance*10);
+        Eyelink('command','screen_phys_coords  = %ld %ld %ld %ld', -params.display.dimensions(1)/2*10, -params.display.dimensions(2)/2*10, params.display.dimensions(1)/2*10, params.display.dimensions(2)/2*10);
+        Eyelink('command','screen_distance     = %ld %ld', params.display.distance*10, params.display.distance*10);
         % set calibrated/used part of screen, based on per-subject
         % positioning
         Eyelink('command','generate_default_targets = NO');
         calTargets = bsxfun(@plus,bsxfun(@minus,params.EL.basePointPositions,params.EL.basePointPositions(1,:))*params.EL.calScale, [params.display.fixX params.display.fixY]);
         fmt = repmat('%.0f,%.0f ',1,size(calTargets,1)); fmt(end) = [];
-        EyeLink('command',sprintf(['calibration_targets = ' fmt],calTargets.'));
+        Eyelink('command',sprintf(['calibration_targets = ' fmt],calTargets.'));
         valTargets = bsxfun(@plus,bsxfun(@minus,params.EL.basePointPositions,params.EL.basePointPositions(1,:))*params.EL.valScale, [params.display.fixX params.display.fixY]);
-        EyeLink('command',sprintf(['validation_targets = ' fmt],valTargets.'));
+        Eyelink('command',sprintf(['validation_targets = ' fmt],valTargets.'));
         
         Eyelink('command', 'file_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,HREF,PUPIL,STATUS,INPUT,HMARKER,HTARGET');
         Eyelink('command', 'link_sample_data  = LEFT,RIGHT,GAZE,GAZERES,AREA,STATUS,HTARGET');
-        Eyelink('command', 'file_event_data  = LEFT,RIGHT,MESSAGE,BUTTON,INPUT');
-        Eyelink('command', 'link_event_data  = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT');
+        Eyelink('command', 'file_event_data   = LEFT,RIGHT,MESSAGE,BUTTON,INPUT');
+        Eyelink('command', 'link_event_data   = LEFT,RIGHT,FIXATION,SACCADE,BLINK,MESSAGE,BUTTON,INPUT');
         [v, vs]=Eyelink('GetTrackerVersion');
         fprintf('Running experiment on a "%s" tracker.\n', vs);
         Eyelink('Openfile', params.EL.filenm);
