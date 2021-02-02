@@ -33,6 +33,8 @@ if ~isdir(posDir)
     mkdir(posDir);
 end
 
+setenv('PTB_SKIPSPLASH','1')                % stop 10s long splashscreen...
+
 subject = input('Enter Subject Initials: ','s');
 assert(~isempty(subject),'provide a subject name');
 useET = input('Use EyeLink? (y/n): ','s');
