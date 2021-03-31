@@ -14,10 +14,10 @@ try
     
     %Eyelink('SetAddress','');
     el                              = EyelinkInitDefaults(params.display.windowPtr);
-    el.backgroundcolour             = [.5 .5 .5];
-    el.foregroundcolour             = [1 1 1];
+    el.backgroundcolour             = [.5 .5 .5]*255;
+    el.foregroundcolour             = [0 0 0];
     el.calibrationtargetcolour      = [255 0 0];
-    el.msgfontcolour                = GrayIndex(params.display.windowPtr);
+    el.msgfontcolour                = [0 0 0];
     el.calibrationtargetsize        = 20/params.display.numPixels(1)*100;  % in percentage of screen size
     el.calibrationtargetwidth       = 6/params.display.numPixels(1)*100;
     % switch off sounds (set to 0) as they are annoying and i've had issues with them crashing
