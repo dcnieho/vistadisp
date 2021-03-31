@@ -146,6 +146,7 @@ for frame = 1:nFrames
     if ~qPostedSync && usingEL
         % indicate start of recording interval
         Eyelink('Message', 'SYNCTIME');
+        qPostedSync = true;
     end
     
     % send trigger for MEG, if requested, and record the color of the PD
