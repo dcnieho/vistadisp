@@ -60,8 +60,9 @@ params.homeDir = homeDir;
 params.subject = subject;
 
 % filenames
-params.paramsFileName = fullfile(params.homeDir,'data',sprintf('%s_%s_params.mat',params.subject,datestr(now,30)));
-params.saveMatrix     = fullfile(params.homeDir,'data',sprintf('%s_%s_images.mat',params.subject,datestr(now,30)));
+ts = datestr(now,30);
+params.paramsFileName = fullfile(params.homeDir,'data',sprintf('%s_%s_params.mat',params.subject,ts));
+params.saveMatrix     = fullfile(params.homeDir,'data',sprintf('%s_%s_images.mat',params.subject,ts));
 
 % now set rest of the params
 params = setRetinotopyParams(params.experiment, params);
