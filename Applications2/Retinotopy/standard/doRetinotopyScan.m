@@ -50,10 +50,10 @@ try
     if isfield(params,'useEL') && params.useEL
         Eyelink('SetAddress',params.EL.ip);
         el                              = EyelinkInitDefaults(params.display.windowPtr);
-        el.backgroundcolour             = params.backRGB.dir.*params.backRGB.scale;
-        el.foregroundcolour             = params.stimLMS.dir.*params.stimLMS.scale;
+        el.backgroundcolour             = params.backRGB.dir.*params.backRGB.scale*255;
+        el.foregroundcolour             = [0 0 0];
         el.calibrationtargetcolour      = [255 0 0];
-        el.msgfontcolour                = GrayIndex(params.display.windowPtr);
+        el.msgfontcolour                = [0 0 0];
         el.calibrationtargetsize        = 20/params.display.numPixels(1)*100;  % in percentage of screen size
         el.calibrationtargetwidth       = 6/params.display.numPixels(1)*100;
         % switch off sounds (set to 0) as they are annoying and i've had issues with them crashing
@@ -177,6 +177,7 @@ catch ME
     % clean up if error occurred
     Screen('CloseAll'); 
     setGamma(0); Priority(0); ShowCursor;
+    Eyelink('Shutdown');
     %warning(ME.identifier, ME.message);
     rethrow(ME)
 end;
