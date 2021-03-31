@@ -83,7 +83,7 @@ if params.useEL
     WaitSecs(0.5);
     Eyelink('CloseFile');
     
-    edfFile = fullfile(params.homeDir,'data',sprintf('%s.edf',params.subject));
+    edfFile = fullfile(params.homeDir,'data',sprintf('%s_%s.edf',params.subject,ts));
     try
         fprintf('Receiving data file ''%s''\n', edfFile);
         warning('make sure data file ends up in right place')
