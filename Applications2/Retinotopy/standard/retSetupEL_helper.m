@@ -16,7 +16,7 @@ try
     el                              = EyelinkInitDefaults(params.display.windowPtr);
     el.backgroundcolour             = [.5 .5 .5]*255;
     el.foregroundcolour             = [0 0 0];
-    el.calibrationtargetcolour      = [255 0 0];
+    el.calibrationtargetcolour      = [0 0 0];
     el.msgfontcolour                = [0 0 0];
     el.calibrationtargetsize        = 20/params.display.numPixels(1)*100;  % in percentage of screen size
     el.calibrationtargetwidth       = 6/params.display.numPixels(1)*100;
