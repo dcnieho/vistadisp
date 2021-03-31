@@ -21,6 +21,9 @@ function [params,response,timing] = retHardcoded
 %   ret(params)
 
 homeDir = fullfile(fileparts(mfilename('fullpath')),'..','..','..');
+% normalize path
+a=dir(homeDir);
+homeDir = a(1).folder;
 addpath(genpath(homeDir))
 
 % make directories
@@ -87,8 +90,8 @@ if params.useEL
     try
         fprintf('Receiving data file ''%s''\n', edfFile);
         warning('make sure data file ends up in right place')
-        status=Eyelink('ReceiveFile');
-        if status > 0
+        status=Eyelink('ReceiveFile','',edfFile);
+        if status <= 0
             fprintf('ReceiveFile status %d\n', status);
         end
     catch
